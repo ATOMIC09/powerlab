@@ -1,34 +1,22 @@
 {
   "name": "powerlab",
-  "productName": "powerlab",
   "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": "src/index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "start": "electron ."
   },
-  "keywords": [],
-  "author": {
-    "name": "Phutawan Chanrueng",
-    "email": "phutawanchanrueng@gmail.com"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ATOMIC09/serial-power-logger.git"
   },
-  "license": "MIT",
-  "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+  "author": "ATOMIC09",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/ATOMIC09/serial-power-logger/issues"
   },
+  "homepage": "https://github.com/ATOMIC09/serial-power-logger#readme",
+  "description": "An Electron application for logging power data and controlling devices via serial communication.",
   "devDependencies": {
-    "@electron-forge/cli": "^7.8.1",
-    "@electron-forge/maker-deb": "^7.8.1",
-    "@electron-forge/maker-rpm": "^7.8.1",
-    "@electron-forge/maker-squirrel": "^7.8.1",
-    "@electron-forge/maker-zip": "^7.8.1",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
-    "@electron-forge/plugin-fuses": "^7.8.1",
-    "@electron/fuses": "^1.8.0",
-    "electron": "37.1.0"
+    "electron": "^37.1.0"
   }
 }

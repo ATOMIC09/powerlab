@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -11,6 +11,11 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('electronAPI', {
+      serialOpen: (port, baud) => ipcRenderer.invoke('serial-open', port, baud),
+      serialSend: (msg) => ipcRenderer.invoke('serial-send', msg),
+      onSerialData: (callback) => ipcRenderer.on('serial-data', (_, data) => callback(data))
+    })
   } catch (error) {
     console.error(error)
   }

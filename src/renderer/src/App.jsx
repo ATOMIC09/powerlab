@@ -3,7 +3,7 @@ function App() {
 
   return (
     <>
-      <h1>wat</h1>
+      <div className="text-9xl">wat</div>
     </>
   )
 }

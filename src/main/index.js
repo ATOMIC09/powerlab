@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { SerialPort } from 'serialport'
 
 let mainWindow
 let port
@@ -54,6 +55,19 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  // Handle COM ports request
+  ipcMain.handle('get-com-ports', async () => {
+    try {
+      const ports = await SerialPort.list()
+      const portPaths = ports.map((port) => port.path)
+      console.log('Available COM ports:', portPaths)
+      return portPaths
+    } catch (error) {
+      console.error('Error fetching COM ports:', error)
+      return [] // Return empty array on error
+    }
+  })
 
   createWindow()
 

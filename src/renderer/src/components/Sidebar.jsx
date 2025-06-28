@@ -1,6 +1,145 @@
-export default function Sidebar() {
+import ReplayIcon from '@mui/icons-material/Replay'
+import { useState, useEffect } from 'react'
+
+export default function Sidebar({ isConnected, setIsConnected, selectedPort, setSelectedPort }) {
+  const [comPorts, setComPorts] = useState([])
+  const [portsError, setPortsError] = useState(null)
+  const [isConnecting, setIsConnecting] = useState(false)
+
+  // Function to fetch COM ports
+  const fetchComPorts = async () => {
+    try {
+      setPortsError(null)
+      const ports = await window.api.getComPorts()
+      setComPorts(ports)
+      if (ports.length === 0) {
+        setPortsError('No COM ports available')
+      }
+    } catch (error) {
+      console.error('Error fetching COM ports:', error)
+      setPortsError('Failed to fetch COM ports')
+      setComPorts([])
+    }
+  }
+
+  // Function to handle port connection
+  const handleConnect = async () => {
+    if (!selectedPort) {
+      alert('Please select a COM port first')
+      return
+    }
+
+    if (isConnected) {
+      // Disconnect
+      try {
+        setIsConnecting(true)
+        await window.electronAPI.serialClose()
+        setIsConnected(false)
+      } catch (error) {
+        console.error('Error disconnecting:', error)
+        alert('Failed to disconnect from port')
+      } finally {
+        setIsConnecting(false)
+      }
+    } else {
+      // Connect
+      try {
+        setIsConnecting(true)
+        const result = await window.electronAPI.serialOpen(selectedPort, 9600)
+        if (result === 'opened') {
+          setIsConnected(true)
+        } else {
+          alert('Failed to connect: ' + result)
+        }
+      } catch (error) {
+        console.error('Error connecting:', error)
+        alert('Failed to connect to port')
+      } finally {
+        setIsConnecting(false)
+      }
+    }
+  }
+
+  // Fetch COM ports when the component opens
+  useEffect(() => {
+    fetchComPorts()
+  }, [])
+
   return (
     <div className="sidebar p-4 bg-[#edeff3]">
+      {/* Serial Port Connection Section */}
+      <div className="serial-connection mb-4 p-3 bg-white rounded-lg shadow-sm">
+        <h3 className="text-lg font-medium mb-3">Serial Connection</h3>
+        
+        {/* Port Selection */}
+        <div className="flex gap-2 mb-3">
+          <select 
+            className="flex-1 py-2 px-3 border border-gray-300 rounded"
+            value={selectedPort}
+            onChange={(e) => setSelectedPort(e.target.value)}
+            disabled={isConnected}
+          >
+            {portsError ? (
+              <option value="" disabled>
+                {portsError}
+              </option>
+            ) : comPorts.length > 0 ? (
+              <>
+                <option value="" disabled>
+                  Select a port...
+                </option>
+                {comPorts.map((port) => (
+                  <option key={port} value={port}>
+                    {port}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option value="" disabled>
+                Searching for ports...
+              </option>
+            )}
+          </select>
+          <button 
+            className="p-2 text-gray-700 border border-gray-300 rounded cursor-pointer hover:bg-gray-50" 
+            onClick={fetchComPorts}
+            title="Refresh ports"
+          >
+            <ReplayIcon />
+          </button>
+        </div>
+
+        {/* Connect Button */}
+        <button 
+          className={`w-full p-2 text-white rounded cursor-pointer font-medium ${
+            isConnected 
+              ? 'bg-red-500 hover:bg-red-600' 
+              : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+          onClick={handleConnect}
+          disabled={isConnecting || (!selectedPort && !isConnected)}
+        >
+          {isConnecting 
+            ? 'Connecting...' 
+            : isConnected 
+              ? 'Disconnect' 
+              : 'Connect'
+          }
+        </button>
+
+        {/* Connection Status */}
+        <div className="flex items-center gap-2 mt-3">
+          <div 
+            className={`w-3 h-3 rounded-full ${
+              isConnected ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          ></div>
+          <span className="text-sm text-gray-600">
+            {isConnected ? `Connected to ${selectedPort}` : 'Disconnected'}
+          </span>
+        </div>
+      </div>
+
       {/* Voltage and Current Display Section */}
       <div className="voltage-current-display mb-4">
         {/* CH1 Display */}

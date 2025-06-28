@@ -111,3 +111,16 @@ ipcMain.handle('serial-send', async (_, message) => {
   }
   return 'port not open'
 })
+
+ipcMain.handle('serial-close', async () => {
+  try {
+    if (port && port.isOpen) {
+      port.close()
+      port = null
+      return 'closed'
+    }
+    return 'port not open'
+  } catch (err) {
+    return 'error: ' + err.message
+  }
+})

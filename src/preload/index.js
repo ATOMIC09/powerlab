@@ -23,6 +23,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electronAPI', {
       serialOpen: (port, baud) => ipcRenderer.invoke('serial-open', port, baud),
       serialSend: (msg) => ipcRenderer.invoke('serial-send', msg),
+      serialClose: () => ipcRenderer.invoke('serial-close'),
       onSerialData: (callback) => ipcRenderer.on('serial-data', (_, data) => callback(data)),
     })
   } catch (error) {

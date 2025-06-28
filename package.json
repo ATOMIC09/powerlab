@@ -21,6 +21,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/vite": "^4.1.11",
     "electron-store": "^10.1.0",
+    "react-router-dom": "^7.6.3",
     "serialport": "^13.0.0",
     "tailwindcss": "^4.1.11"
   },

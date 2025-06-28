@@ -8,6 +8,12 @@ export default function TopBar() {
                     <option value="COM3">COM3</option>
                 </select>
                 <button className="p-2 bg-blue-500 text-white rounded">Connect</button>
+                <div className="flex items-center gap-2 bg-gray-400 px-[1px] rounded-2xl"></div>
+                {/* Menu bar */}
+                <div className="flex items-center gap-4">
+                    <button className=" text-gray-900 whitespace-nowrap text-xl">POWER LOGGER</button>
+                    <button className=" text-gray-400 whitespace-nowrap text-xl">SERIAL MONITOR</button>
+                </div>
             </div>
         </div>
     );

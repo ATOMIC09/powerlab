@@ -9,7 +9,7 @@ let port
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     show: false,
@@ -92,9 +92,17 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle('serial-open', async (_, portPath, baudRate = 9600) => {
   try {
+    // Close existing port if open
+    if (port && port.isOpen) {
+      port.removeAllListeners(); // Remove all listeners
+      port.close();
+      port = null;
+    }
+
     port = new SerialPort({ path: portPath, baudRate: parseInt(baudRate), autoOpen: true })
 
     port.on('data', (data) => {
+      console.log('Main process received serial data:', data.toString()); // Debug log
       mainWindow.webContents.send('serial-data', data.toString())
     })
 
@@ -115,6 +123,7 @@ ipcMain.handle('serial-send', async (_, message) => {
 ipcMain.handle('serial-close', async () => {
   try {
     if (port && port.isOpen) {
+      port.removeAllListeners(); // Remove all listeners before closing
       port.close()
       port = null
       return 'closed'

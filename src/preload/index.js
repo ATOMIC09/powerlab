@@ -24,7 +24,13 @@ if (process.contextIsolated) {
       serialOpen: (port, baud) => ipcRenderer.invoke('serial-open', port, baud),
       serialSend: (msg) => ipcRenderer.invoke('serial-send', msg),
       serialClose: () => ipcRenderer.invoke('serial-close'),
-      onSerialData: (callback) => ipcRenderer.on('serial-data', (_, data) => callback(data)),
+      onSerialData: (callback) => {
+        // Remove any existing listeners first to prevent duplicates
+        ipcRenderer.removeAllListeners('serial-data');
+        // Add the new listener
+        ipcRenderer.on('serial-data', (_, data) => callback(data));
+      },
+      removeSerialDataListener: () => ipcRenderer.removeAllListeners('serial-data'),
     })
   } catch (error) {
     console.error(error)

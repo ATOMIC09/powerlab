@@ -111,7 +111,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
 
         {/* Connect Button */}
         <button 
-          className={`w-full p-2 text-white rounded cursor-pointer font-medium ${
+          className={`w-full p-2 text-white rounded cursor-pointer font-medium transition-all ${
             isConnected 
               ? 'bg-red-500 hover:bg-red-600' 
               : 'bg-blue-500 hover:bg-blue-600'
@@ -232,7 +232,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
               />
-              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
+              <button className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
           <div>
@@ -243,7 +243,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
               />
-              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
+              <button className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
               />
-              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
+              <button className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
           <div>
@@ -272,7 +272,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
               />
-              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
+              <button className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
         </div>
@@ -308,7 +308,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
 
       {/* ON/OFF Toggle Button */}
       <div className="toggle-button">
-        <button className="w-full p-2 bg-green-500 text-white rounded cursor-pointer">Output ON/OFF</button>
+        <button className="w-full p-2 bg-green-500 hover:bg-green-600 transition-all text-white rounded cursor-pointer">Output ON/OFF</button>
       </div>
     </div>
   );

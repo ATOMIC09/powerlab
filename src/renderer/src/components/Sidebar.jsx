@@ -93,7 +93,7 @@ export default function Sidebar() {
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
               />
-              <button className="p-2 bg-blue-500 text-white rounded">Apply</button>
+              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
           <div>
@@ -104,7 +104,7 @@ export default function Sidebar() {
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
               />
-              <button className="p-2 bg-blue-500 text-white rounded">Apply</button>
+              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function Sidebar() {
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
               />
-              <button className="p-2 bg-blue-500 text-white rounded">Apply</button>
+              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
           <div>
@@ -133,7 +133,7 @@ export default function Sidebar() {
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
               />
-              <button className="p-2 bg-blue-500 text-white rounded">Apply</button>
+              <button className="p-2 bg-blue-500 text-white rounded cursor-pointer">Apply</button>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function Sidebar() {
 
       {/* ON/OFF Toggle Button */}
       <div className="toggle-button">
-        <button className="w-full p-2 bg-green-500 text-white rounded">Output ON/OFF</button>
+        <button className="w-full p-2 bg-green-500 text-white rounded cursor-pointer">Output ON/OFF</button>
       </div>
     </div>
   );

@@ -81,21 +81,21 @@ class SerialCommandQueue {
 
   clear() {
     // Reject all pending commands
-    this.queue.forEach(item => {
+    this.queue.forEach((item) => {
       item.reject(new Error('Queue cleared'))
     })
     this.queue = []
-    
+
     if (this.currentCommand) {
       this.currentCommand.reject(new Error('Queue cleared'))
       this.currentCommand = null
     }
-    
+
     if (this.timeoutId) {
       clearTimeout(this.timeoutId)
       this.timeoutId = null
     }
-    
+
     this.isProcessing = false
   }
 }
@@ -189,9 +189,9 @@ ipcMain.handle('serial-open', async (_, portPath, baudRate = 9600) => {
   try {
     // Close existing port if open
     if (port && port.isOpen) {
-      port.removeAllListeners(); // Remove all listeners
-      port.close();
-      port = null;
+      port.removeAllListeners() // Remove all listeners
+      port.close()
+      port = null
     }
 
     // Clear the serial buffer
@@ -202,22 +202,22 @@ ipcMain.handle('serial-open', async (_, portPath, baudRate = 9600) => {
     port.on('data', (data) => {
       const chunk = data.toString()
       serialBuffer += chunk
-      
+
       // Check if we have complete lines (ending with \n or \r\n)
       let lines = serialBuffer.split(/\r?\n/)
-      
+
       // Keep the last incomplete line in the buffer
       serialBuffer = lines.pop() || ''
-      
+
       // Process each complete line
-      lines.forEach(line => {
+      lines.forEach((line) => {
         if (line.trim().length > 0) {
           const response = line.trim()
           console.log('Main process received complete response:', response)
-          
+
           // Handle command queue response
           commandQueue.handleResponse(response)
-          
+
           // Also send to renderer for any listeners
           mainWindow.webContents.send('serial-data', response)
         }
@@ -245,7 +245,7 @@ ipcMain.handle('serial-send-command', async (_, command) => {
       reject(new Error('Port not open'))
       return
     }
-    
+
     commandQueue.enqueue(command, resolve, reject)
   })
 })
@@ -264,7 +264,7 @@ ipcMain.handle('serial-read-all-values', async () => {
   ]
 
   const results = {}
-  
+
   try {
     for (const cmd of commands) {
       const response = await new Promise((resolve, reject) => {
@@ -274,20 +274,20 @@ ipcMain.handle('serial-read-all-values', async () => {
         }
         commandQueue.enqueue(cmd.command, resolve, reject)
       })
-      
+
       // Parse the response (e.g., "1200" -> 12.00 for voltage, "2500" -> 2.500 for current)
       const numValue = parseInt(response)
       if (!isNaN(numValue)) {
         if (cmd.key.includes('Current')) {
           results[cmd.key] = numValue / 1000 // Convert to Amps (e.g., 2500 -> 2.500A)
         } else {
-          results[cmd.key] = numValue / 100  // Convert to Volts (e.g., 1200 -> 12.00V)
+          results[cmd.key] = numValue / 100 // Convert to Volts (e.g., 1200 -> 12.00V)
         }
       } else {
         results[cmd.key] = response // Keep original response if not numeric
       }
     }
-    
+
     return results
   } catch (error) {
     throw new Error('Failed to read values: ' + error.message)
@@ -299,7 +299,7 @@ ipcMain.handle('serial-close', async () => {
     // Clear the command queue and buffer
     commandQueue.clear()
     serialBuffer = ''
-    
+
     if (port && port.isOpen) {
       port.removeAllListeners() // Remove all listeners before closing
       port.close()
@@ -319,7 +319,7 @@ ipcMain.handle('serial-get-device-model', async () => {
       reject(new Error('Port not open'))
       return
     }
-    
+
     commandQueue.enqueue('a', resolve, reject)
   })
 })

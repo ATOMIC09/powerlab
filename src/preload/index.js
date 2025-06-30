@@ -10,7 +10,7 @@ const api = {
       console.error('Error fetching COM ports:', error)
       return []
     }
-  },
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -29,11 +29,11 @@ if (process.contextIsolated) {
       serialClose: () => ipcRenderer.invoke('serial-close'),
       onSerialData: (callback) => {
         // Remove any existing listeners first to prevent duplicates
-        ipcRenderer.removeAllListeners('serial-data');
+        ipcRenderer.removeAllListeners('serial-data')
         // Add the new listener
-        ipcRenderer.on('serial-data', (_, data) => callback(data));
+        ipcRenderer.on('serial-data', (_, data) => callback(data))
       },
-      removeSerialDataListener: () => ipcRenderer.removeAllListeners('serial-data'),
+      removeSerialDataListener: () => ipcRenderer.removeAllListeners('serial-data')
     })
   } catch (error) {
     console.error(error)

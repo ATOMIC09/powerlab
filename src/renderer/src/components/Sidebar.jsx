@@ -284,6 +284,27 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     }
   }
 
+  // Functions to handle output on/off
+  const handleOutputOn = async () => {
+    try {
+      await window.electronAPI.serialSendCommand('o1')
+      console.log('Output switched ON (command: o1)')
+    } catch (error) {
+      console.error('Error turning output on:', error)
+      alert('Failed to turn output on')
+    }
+  }
+
+  const handleOutputOff = async () => {
+    try {
+      await window.electronAPI.serialSendCommand('o0')
+      console.log('Output switched OFF (command: o0)')
+    } catch (error) {
+      console.error('Error turning output off:', error)
+      alert('Failed to turn output off')
+    }
+  }
+
   return (
     <div className="sidebar p-4 bg-[#edeff3]">
       {/* Serial Port Connection Section */}
@@ -583,11 +604,25 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       </div>
       <hr className="my-4" />
 
-      {/* ON/OFF Toggle Button */}
-      <div className="toggle-button">
-        <button className="w-full p-2 bg-green-500 hover:bg-green-600 transition-all text-white rounded cursor-pointer">
-          Output ON/OFF
-        </button>
+      {/* Output Control Buttons */}
+      <div className="output-control">
+        <h3 className="mb-3">Output Control</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            className="p-2 bg-green-500 hover:bg-green-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={handleOutputOn}
+            disabled={!isConnected}
+          >
+            Output ON
+          </button>
+          <button
+            className="p-2 bg-red-500 hover:bg-red-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={handleOutputOff}
+            disabled={!isConnected}
+          >
+            Output OFF
+          </button>
+        </div>
       </div>
     </div>
   )

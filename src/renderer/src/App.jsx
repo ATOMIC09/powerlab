@@ -2,7 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useState, useCallback } from 'react'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
-import OscilloscopeChart from './components/OscilloscopeChart'
+import OscilloscopeChartRecharts from './components/OscilloscopeChartRecharts'
 import SerialMonitor from './pages/SerialMonitor'
 
 export default function App() {
@@ -46,7 +46,9 @@ export default function App() {
           <Routes>
             <Route
               path="/"
-              element={<OscilloscopeChart isConnected={isConnected} deviceState={deviceState} />}
+              element={
+                <OscilloscopeChartRecharts isConnected={isConnected} deviceState={deviceState} />
+              }
             />
             <Route path="/serial-monitor" element={<SerialMonitor />} />
           </Routes>

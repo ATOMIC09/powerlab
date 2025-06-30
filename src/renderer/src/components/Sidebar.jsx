@@ -6,6 +6,21 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const [portsError, setPortsError] = useState(null)
   const [isConnecting, setIsConnecting] = useState(false)
 
+  const [ch1MeasureVoltage, setCh1MeasureVoltage] = useState(null)
+  const [ch1MeasureCurrent, setCh1MeasureCurrent] = useState(null)
+  const [ch2MeasureVoltage, setCh2MeasureVoltage] = useState(null)
+  const [ch2MeasureCurrent, setCh2MeasureCurrent] = useState(null)
+  const [ch1PresetVoltage, setCh1PresetVoltage] = useState(null)
+  const [ch1PresetCurrent, setCh1PresetCurrent] = useState(null)
+  const [ch2PresetVoltage, setCh2PresetVoltage] = useState(null)
+  const [ch2PresetCurrent, setCh2PresetCurrent] = useState(null)
+  const [workingMode, setWorkingMode] = useState('0000') // 0000: Independent, 0017: SER, 0001: PARA, 0016: TRACK
+  const [lockState, setLockState] = useState('0000') // 0000: Unlocked, 0001: Locked
+  const [ch1State, setCh1State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
+  const [ch2State, setCh2State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
+  const [ch3State, setCh3State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
+
+
   // Function to fetch COM ports
   const fetchComPorts = async () => {
     try {
@@ -64,6 +79,39 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   useEffect(() => {
     fetchComPorts()
   }, [])
+
+  // Read measure, preset values, channelState, and working mode every second if connected
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (isConnected) {
+        try {
+          // Read parameter
+          const result = await window.electronAPI.serialReadAllValues()
+          if (result) {
+            setCh1MeasureVoltage(result.ch1Voltage)
+            setCh1MeasureCurrent(result.ch1Current)
+            setCh2MeasureVoltage(result.ch2Voltage)
+            setCh2MeasureCurrent(result.ch2Current)
+            setCh1PresetVoltage(result.ch1PresetVoltage)
+            setCh1PresetCurrent(result.ch1PresetCurrent)
+            setCh2PresetVoltage(result.ch2PresetVoltage)
+            setCh2PresetCurrent(result.ch2PresetCurrent)
+            setWorkingMode(result.workingMode)
+            setLockState(result.lockState)
+            setCh1State(result.ch1State)
+            setCh2State(result.ch2State)
+            setCh3State(result.ch3State)
+          }
+
+        } catch (error) {
+          console.error('Error reading CH1 voltage:', error);
+        }
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [isConnected])
+
 
   return (
     <div className="sidebar p-4 bg-[#edeff3]">
@@ -147,10 +195,14 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
         <div className="ch1-display flex items-center justify-between mb-4">
           <div className="items-center gap-4">
             <div>
-              <div className="text-5xl font-light text-right">12.00 V</div>
+              <div className="text-5xl font-light text-right">
+                {ch1MeasureVoltage !== null ? `${ch1MeasureVoltage.toFixed(2)} V` : '---.-- V'}
+              </div>
             </div>
             <div>
-              <div className="text-5xl font-light text-right">1.500 A</div>
+              <div className="text-5xl font-light text-right">
+                {ch1MeasureCurrent !== null ? `${ch1MeasureCurrent.toFixed(3)} A` : '--.--- A'}
+              </div>
             </div>
           </div>
           <div className="status-indicators gap-2 items-center">
@@ -173,10 +225,14 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
         <div className="ch2-display flex items-center justify-between mb-4">
           <div className="items-center gap-4">
             <div>
-              <div className="text-5xl font-light text-right">05.00 V</div>
+              <div className="text-5xl font-light text-right">
+                {ch2MeasureVoltage !== null ? `${ch2MeasureVoltage.toFixed(2)} V` : '---.-- V'}
+              </div>
             </div>
             <div>
-              <div className="text-5xl font-light text-right">0.800 A</div>
+              <div className="text-5xl font-light text-right">
+                {ch2MeasureCurrent !== null ? `${ch2MeasureCurrent.toFixed(3)} A` : '--.--- A'}
+              </div>
             </div>
           </div>
           <div className="status-indicators gap-2 items-center">

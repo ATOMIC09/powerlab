@@ -23,6 +23,9 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electronAPI', {
       serialOpen: (port, baud) => ipcRenderer.invoke('serial-open', port, baud),
       serialSend: (msg) => ipcRenderer.invoke('serial-send', msg),
+      serialSendCommand: (command) => ipcRenderer.invoke('serial-send-command', command),
+      serialReadAllValues: () => ipcRenderer.invoke('serial-read-all-values'),
+      serialGetDeviceModel: () => ipcRenderer.invoke('serial-get-device-model'),
       serialClose: () => ipcRenderer.invoke('serial-close'),
       onSerialData: (callback) => {
         // Remove any existing listeners first to prevent duplicates

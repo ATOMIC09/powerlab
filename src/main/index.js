@@ -261,7 +261,9 @@ ipcMain.handle('serial-read-all-values', async () => {
     { key: 'ch2Current', command: 'rj' },
     { key: 'ch2PresetVoltage', command: 'rk' },
     { key: 'ch2PresetCurrent', command: 'rq' },
-    { key: 'workingMode', command: 'rm' }
+    { key: 'workingMode', command: 'rm' },
+    { key: 'ch1State', command: 'rs' },
+    { key: 'ch2State', command: 'rp' }
   ]
 
   const results = {}
@@ -277,8 +279,8 @@ ipcMain.handle('serial-read-all-values', async () => {
       })
 
       // Parse the response
-      if (cmd.key === 'workingMode') {
-        // For working mode, keep the response as is (e.g., "0000", "0001", "0016", "0017")
+      if (cmd.key === 'workingMode' || cmd.key.includes('State')) {
+        // For working mode and channel states, keep the response as is (e.g., "0000", "0001", "0016")
         results[cmd.key] = response.trim()
       } else {
         // Parse numeric values for voltage/current

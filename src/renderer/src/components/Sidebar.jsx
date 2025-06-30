@@ -23,10 +23,8 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
 
   const [workingMode, setWorkingMode] = useState('0000') // 0000: Independent, 0017: SER, 0001: PARA, 0016: TRACK
   const [selectedOutputMode, setSelectedOutputMode] = useState('independent')
-  const [lockState, setLockState] = useState('0000') // 0000: Unlocked, 0001: Locked
   const [ch1State, setCh1State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
   const [ch2State, setCh2State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
-  const [ch3State, setCh3State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
 
   // Function to fetch COM ports
   const fetchComPorts = async () => {
@@ -104,10 +102,8 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
             setCh2PresetVoltage(result.ch2PresetVoltage)
             setCh2PresetCurrent(result.ch2PresetCurrent)
             setWorkingMode(result.workingMode)
-            setLockState(result.lockState)
             setCh1State(result.ch1State)
             setCh2State(result.ch2State)
-            setCh3State(result.ch3State)
           }
         } catch (error) {
           console.error('Error reading CH1 voltage:', error)
@@ -153,6 +149,15 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
         setSelectedOutputMode('independent')
     }
   }, [workingMode])
+
+  // Helper functions to determine LED states
+  const getChannelLEDStates = (channelState) => {
+    return {
+      cv: channelState === '0001', // C.V mode
+      cc: channelState === '0016', // C.C mode
+      out: channelState === '0001' || channelState === '0016' // Output ON (either C.V or C.C)
+    }
+  }
 
   // Functions to handle setting preset values
   const handleSetCh1Voltage = async () => {
@@ -390,16 +395,22 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           </div>
           <div className="status-indicators gap-2 items-center">
             <div className="flex items-center gap-2">
-              <div className="status bg-red-500 w-4 h-4 rounded-full"></div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
+              ></div>
               <div>C.V</div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="status bg-green-500 w-4 h-4 rounded-full"></div>
-              <div>C.C</div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
+              ></div>
+              <div>OUT</div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="status bg-yellow-500 w-4 h-4 rounded-full"></div>
-              <div>OUT</div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
+              ></div>
+              <div>C.C</div>
             </div>
           </div>
         </div>
@@ -420,16 +431,22 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           </div>
           <div className="status-indicators gap-2 items-center">
             <div className="flex items-center gap-2">
-              <div className="status bg-red-500 w-4 h-4 rounded-full"></div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
+              ></div>
               <div>C.V</div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="status bg-green-500 w-4 h-4 rounded-full"></div>
-              <div>C.C</div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
+              ></div>
+              <div>OUT</div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="status bg-yellow-500 w-4 h-4 rounded-full"></div>
-              <div>OUT</div>
+              <div
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
+              ></div>
+              <div>C.C</div>
             </div>
           </div>
         </div>
@@ -567,21 +584,6 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
                 5V
               </button>
             </div>
-          </div>
-        </div>
-
-        <div className="flex status-indicators gap-2 items-center justify-center my-4">
-          <div className="flex items-center gap-2">
-            <div className="status bg-red-500 w-4 h-4 rounded-full"></div>
-            <div>C.V</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="status bg-green-500 w-4 h-4 rounded-full"></div>
-            <div>C.C</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="status bg-yellow-500 w-4 h-4 rounded-full"></div>
-            <div>OUT</div>
           </div>
         </div>
       </div>

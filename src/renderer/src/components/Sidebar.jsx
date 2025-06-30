@@ -1,25 +1,17 @@
 import ReplayIcon from '@mui/icons-material/Replay'
 import { useState, useEffect } from 'react'
 
-export default function Sidebar({ isConnected, setIsConnected, selectedPort, setSelectedPort }) {
+export default function Sidebar({
+  isConnected,
+  setIsConnected,
+  selectedPort,
+  setSelectedPort,
+  deviceState,
+  setDeviceState
+}) {
   const [comPorts, setComPorts] = useState([])
   const [portsError, setPortsError] = useState(null)
   const [isConnecting, setIsConnecting] = useState(false)
-
-  // Consolidated device state for better performance
-  const [deviceState, setDeviceState] = useState({
-    ch1MeasureVoltage: null,
-    ch1MeasureCurrent: null,
-    ch2MeasureVoltage: null,
-    ch2MeasureCurrent: null,
-    ch1PresetVoltage: null,
-    ch1PresetCurrent: null,
-    ch2PresetVoltage: null,
-    ch2PresetCurrent: null,
-    workingMode: '0000',
-    ch1State: '0000',
-    ch2State: '0000'
-  })
 
   // Input field values for setting presets
   const [ch1VoltageInput, setCh1VoltageInput] = useState('')
@@ -97,8 +89,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           const result = await window.electronAPI.serialReadAllValues()
           if (result) {
             // Single state update for better performance
-            setDeviceState((prevState) => ({
-              ...prevState,
+            setDeviceState({
               ch1MeasureVoltage: result.ch1Voltage,
               ch1MeasureCurrent: result.ch1Current,
               ch2MeasureVoltage: result.ch2Voltage,
@@ -110,7 +101,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
               workingMode: result.workingMode,
               ch1State: result.ch1State,
               ch2State: result.ch2State
-            }))
+            })
           }
         } catch (error) {
           console.error('Error reading device state:', error)
@@ -119,32 +110,32 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     }, 250)
 
     return () => clearInterval(interval)
-  }, [isConnected])
+  }, [isConnected, setDeviceState])
 
   // Update input fields when preset values change
   useEffect(() => {
-    if (deviceState.ch1PresetVoltage !== null) {
+    if (deviceState?.ch1PresetVoltage !== null) {
       setCh1VoltageInput(deviceState.ch1PresetVoltage.toFixed(2))
     }
-    if (deviceState.ch1PresetCurrent !== null) {
+    if (deviceState?.ch1PresetCurrent !== null) {
       setCh1CurrentInput(deviceState.ch1PresetCurrent.toFixed(3))
     }
-    if (deviceState.ch2PresetVoltage !== null) {
+    if (deviceState?.ch2PresetVoltage !== null) {
       setCh2VoltageInput(deviceState.ch2PresetVoltage.toFixed(2))
     }
-    if (deviceState.ch2PresetCurrent !== null) {
+    if (deviceState?.ch2PresetCurrent !== null) {
       setCh2CurrentInput(deviceState.ch2PresetCurrent.toFixed(3))
     }
   }, [
-    deviceState.ch1PresetVoltage,
-    deviceState.ch1PresetCurrent,
-    deviceState.ch2PresetVoltage,
-    deviceState.ch2PresetCurrent
+    deviceState?.ch1PresetVoltage,
+    deviceState?.ch1PresetCurrent,
+    deviceState?.ch2PresetVoltage,
+    deviceState?.ch2PresetCurrent
   ])
 
   // Update selected output mode based on working mode
   useEffect(() => {
-    switch (deviceState.workingMode) {
+    switch (deviceState?.workingMode) {
       case '0000':
         setSelectedOutputMode('independent')
         break
@@ -160,7 +151,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       default:
         setSelectedOutputMode('independent')
     }
-  }, [deviceState.workingMode])
+  }, [deviceState?.workingMode])
 
   // Helper functions to determine LED states
   const getChannelLEDStates = (channelState) => {
@@ -184,7 +175,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       const voltageValue = Math.round(voltage * 100)
       const command = `su${voltageValue.toString().padStart(4, '0')}`
       await window.electronAPI.serialSendCommand(command)
-      console.log(`Set CH1 voltage to ${voltage}V (command: ${command})`)
+      // console.log(`Set CH1 voltage to ${voltage}V (command: ${command})`)
     } catch (error) {
       console.error('Error setting CH1 voltage:', error)
       alert('Failed to set CH1 voltage')
@@ -203,7 +194,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       const currentValue = Math.round(current * 1000)
       const command = `si${currentValue.toString().padStart(4, '0')}`
       await window.electronAPI.serialSendCommand(command)
-      console.log(`Set CH1 current to ${current}A (command: ${command})`)
+      // console.log(`Set CH1 current to ${current}A (command: ${command})`)
     } catch (error) {
       console.error('Error setting CH1 current:', error)
       alert('Failed to set CH1 current')
@@ -222,7 +213,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       const voltageValue = Math.round(voltage * 100)
       const command = `sa${voltageValue.toString().padStart(4, '0')}`
       await window.electronAPI.serialSendCommand(command)
-      console.log(`Set CH2 voltage to ${voltage}V (command: ${command})`)
+      // console.log(`Set CH2 voltage to ${voltage}V (command: ${command})`)
     } catch (error) {
       console.error('Error setting CH2 voltage:', error)
       alert('Failed to set CH2 voltage')
@@ -241,7 +232,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       const currentValue = Math.round(current * 1000)
       const command = `sd${currentValue.toString().padStart(4, '0')}`
       await window.electronAPI.serialSendCommand(command)
-      console.log(`Set CH2 current to ${current}A (command: ${command})`)
+      // console.log(`Set CH2 current to ${current}A (command: ${command})`)
     } catch (error) {
       console.error('Error setting CH2 current:', error)
       alert('Failed to set CH2 current')
@@ -252,7 +243,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const handleSetCh3_33V = async () => {
     try {
       await window.electronAPI.serialSendCommand('o8')
-      console.log('Set CH3 to 3.3V (command: o8)')
+      // console.log('Set CH3 to 3.3V (command: o8)')
     } catch (error) {
       console.error('Error setting CH3 to 3.3V:', error)
       alert('Failed to set CH3 to 3.3V')
@@ -262,7 +253,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const handleSetCh3_5V = async () => {
     try {
       await window.electronAPI.serialSendCommand('o9')
-      console.log('Set CH3 to 5V (command: o9)')
+      // console.log('Set CH3 to 5V (command: o9)')
     } catch (error) {
       console.error('Error setting CH3 to 5V:', error)
       alert('Failed to set CH3 to 5V')
@@ -272,7 +263,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const handleSetCh3_25V = async () => {
     try {
       await window.electronAPI.serialSendCommand('oa')
-      console.log('Set CH3 to 2.5V (command: oa)')
+      // console.log('Set CH3 to 2.5V (command: oa)')
     } catch (error) {
       console.error('Error setting CH3 to 2.5V:', error)
       alert('Failed to set CH3 to 2.5V')
@@ -292,7 +283,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       const command = commands[mode]
       if (command) {
         await window.electronAPI.serialSendCommand(command)
-        console.log(`Set output mode to ${mode.toUpperCase()} (command: ${command})`)
+        // console.log(`Set output mode to ${mode.toUpperCase()} (command: ${command})`)
         setSelectedOutputMode(mode)
       }
     } catch (error) {
@@ -305,7 +296,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const handleOutputOn = async () => {
     try {
       await window.electronAPI.serialSendCommand('o1')
-      console.log('Output switched ON (command: o1)')
+      // console.log('Output switched ON (command: o1)')
     } catch (error) {
       console.error('Error turning output on:', error)
       alert('Failed to turn output on')
@@ -315,7 +306,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const handleOutputOff = async () => {
     try {
       await window.electronAPI.serialSendCommand('o0')
-      console.log('Output switched OFF (command: o0)')
+      // console.log('Output switched OFF (command: o0)')
     } catch (error) {
       console.error('Error turning output off:', error)
       alert('Failed to turn output off')
@@ -396,14 +387,14 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState.ch1MeasureVoltage !== null
+                {deviceState?.ch1MeasureVoltage !== null
                   ? `${deviceState.ch1MeasureVoltage.toFixed(2)} V`
                   : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState.ch1MeasureCurrent !== null
+                {deviceState?.ch1MeasureCurrent !== null
                   ? `${deviceState.ch1MeasureCurrent.toFixed(3)} A`
                   : '--.--- A'}
               </div>
@@ -412,7 +403,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           <div className="status-indicators gap-2 items-center">
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch1State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState?.ch1State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
               ></div>
               <div>C.V</div>
             </div>

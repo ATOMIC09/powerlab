@@ -49,7 +49,7 @@ class SerialCommandQueue {
 
       // Send the command
       port.write(this.currentCommand.command + '\n')
-      console.log('Sent command:', this.currentCommand.command)
+      // console.log('Sent command:', this.currentCommand.command)
     } catch (error) {
       this.currentCommand.reject(error)
       this.currentCommand = null
@@ -156,7 +156,7 @@ app.whenReady().then(() => {
     try {
       const ports = await SerialPort.list()
       const portPaths = ports.map((port) => port.path)
-      console.log('Available COM ports:', portPaths)
+      // console.log('Available COM ports:', portPaths)
       return portPaths
     } catch (error) {
       console.error('Error fetching COM ports:', error)
@@ -213,7 +213,7 @@ ipcMain.handle('serial-open', async (_, portPath, baudRate = 9600) => {
       lines.forEach((line) => {
         if (line.trim().length > 0) {
           const response = line.trim()
-          console.log('Main process received complete response:', response)
+          // console.log('Main process received complete response:', response)
 
           // Handle command queue response
           commandQueue.handleResponse(response)

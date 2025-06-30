@@ -1,13 +1,31 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
+import OscilloscopeChart from './components/OscilloscopeChart'
 import SerialMonitor from './pages/SerialMonitor'
 
 export default function App() {
   const location = useLocation()
   const [isConnected, setIsConnected] = useState(false)
   const [selectedPort, setSelectedPort] = useState('')
+  const [deviceState, setDeviceStateInternal] = useState({
+    ch1MeasureVoltage: null,
+    ch1MeasureCurrent: null,
+    ch2MeasureVoltage: null,
+    ch2MeasureCurrent: null,
+    ch1PresetVoltage: null,
+    ch1PresetCurrent: null,
+    ch2PresetVoltage: null,
+    ch2PresetCurrent: null,
+    workingMode: '0000',
+    ch1State: '0000',
+    ch2State: '0000'
+  })
+
+  const setDeviceState = useCallback((newState) => {
+    setDeviceStateInternal(newState)
+  }, [])
 
   return (
     <>
@@ -19,6 +37,8 @@ export default function App() {
             setIsConnected={setIsConnected}
             selectedPort={selectedPort}
             setSelectedPort={setSelectedPort}
+            deviceState={deviceState}
+            setDeviceState={setDeviceState}
           />
         )}{' '}
         {/* โคตร Hardcode */}
@@ -26,14 +46,7 @@ export default function App() {
           <Routes>
             <Route
               path="/"
-              element={
-                <>
-                  <h1>Data Chart</h1>
-                  <div className="chart-placeholder border border-gray-300 rounded p-4">
-                    <p>ไว้ก่อน</p>
-                  </div>
-                </>
-              }
+              element={<OscilloscopeChart isConnected={isConnected} deviceState={deviceState} />}
             />
             <Route path="/serial-monitor" element={<SerialMonitor />} />
           </Routes>

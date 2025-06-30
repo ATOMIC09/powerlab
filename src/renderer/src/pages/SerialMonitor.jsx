@@ -50,15 +50,6 @@ export default function SerialMonitor() {
     }
   }
 
-  // Auto-scroll to bottom when new logs are added
-  const scrollToBottom = () => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [logs])
-
   // Set up serial data listener when component mounts
   useEffect(() => {
     let isListenerActive = true // Flag to prevent processing after cleanup
@@ -67,7 +58,7 @@ export default function SerialMonitor() {
     const handleSerialData = (data) => {
       if (!isListenerActive) return // Ignore if listener was cleaned up
 
-      console.log('Received raw serial data:', data) // Debug log
+      // console.log('Received raw serial data:', data) // Debug log
 
       // Add the incoming data to the buffer
       dataBufferRef.current += data
@@ -83,7 +74,7 @@ export default function SerialMonitor() {
         const trimmedLine = line.trim()
         if (trimmedLine) {
           // Only log non-empty lines
-          console.log('Processing complete message:', trimmedLine)
+          // console.log('Processing complete message:', trimmedLine)
           addLog(trimmedLine, 'received')
         }
       })
@@ -91,7 +82,7 @@ export default function SerialMonitor() {
 
     // Set up the listener
     if (window.electronAPI && window.electronAPI.onSerialData) {
-      console.log('Setting up serial data listener') // Debug log
+      // console.log('Setting up serial data listener') // Debug log
       window.electronAPI.onSerialData(handleSerialData)
       addLog('Serial data listener established', 'info')
     } else {
@@ -104,7 +95,7 @@ export default function SerialMonitor() {
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up serial data listener') // Debug log
+      // console.log('Cleaning up serial data listener') // Debug log
       isListenerActive = false // Deactivate the listener
       // Properly remove the serial data listener
       if (window.electronAPI && window.electronAPI.removeSerialDataListener) {

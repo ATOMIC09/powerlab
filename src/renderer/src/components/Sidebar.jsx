@@ -6,14 +6,20 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const [portsError, setPortsError] = useState(null)
   const [isConnecting, setIsConnecting] = useState(false)
 
-  const [ch1MeasureVoltage, setCh1MeasureVoltage] = useState(null)
-  const [ch1MeasureCurrent, setCh1MeasureCurrent] = useState(null)
-  const [ch2MeasureVoltage, setCh2MeasureVoltage] = useState(null)
-  const [ch2MeasureCurrent, setCh2MeasureCurrent] = useState(null)
-  const [ch1PresetVoltage, setCh1PresetVoltage] = useState(null)
-  const [ch1PresetCurrent, setCh1PresetCurrent] = useState(null)
-  const [ch2PresetVoltage, setCh2PresetVoltage] = useState(null)
-  const [ch2PresetCurrent, setCh2PresetCurrent] = useState(null)
+  // Consolidated device state for better performance
+  const [deviceState, setDeviceState] = useState({
+    ch1MeasureVoltage: null,
+    ch1MeasureCurrent: null,
+    ch2MeasureVoltage: null,
+    ch2MeasureCurrent: null,
+    ch1PresetVoltage: null,
+    ch1PresetCurrent: null,
+    ch2PresetVoltage: null,
+    ch2PresetCurrent: null,
+    workingMode: '0000',
+    ch1State: '0000',
+    ch2State: '0000'
+  })
 
   // Input field values for setting presets
   const [ch1VoltageInput, setCh1VoltageInput] = useState('')
@@ -21,10 +27,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const [ch2VoltageInput, setCh2VoltageInput] = useState('')
   const [ch2CurrentInput, setCh2CurrentInput] = useState('')
 
-  const [workingMode, setWorkingMode] = useState('0000') // 0000: Independent, 0017: SER, 0001: PARA, 0016: TRACK
   const [selectedOutputMode, setSelectedOutputMode] = useState('independent')
-  const [ch1State, setCh1State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
-  const [ch2State, setCh2State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
 
   // Function to fetch COM ports
   const fetchComPorts = async () => {
@@ -85,54 +88,63 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     fetchComPorts()
   }, [])
 
-  // Read measure, preset values, channelState, and working mode every second if connected
+  // Read measure, preset values, channelState, and working mode every 250ms if connected
   useEffect(() => {
     const interval = setInterval(async () => {
       if (isConnected) {
         try {
-          // Read parameter
+          // Read all parameters in one call and update state once
           const result = await window.electronAPI.serialReadAllValues()
           if (result) {
-            setCh1MeasureVoltage(result.ch1Voltage)
-            setCh1MeasureCurrent(result.ch1Current)
-            setCh2MeasureVoltage(result.ch2Voltage)
-            setCh2MeasureCurrent(result.ch2Current)
-            setCh1PresetVoltage(result.ch1PresetVoltage)
-            setCh1PresetCurrent(result.ch1PresetCurrent)
-            setCh2PresetVoltage(result.ch2PresetVoltage)
-            setCh2PresetCurrent(result.ch2PresetCurrent)
-            setWorkingMode(result.workingMode)
-            setCh1State(result.ch1State)
-            setCh2State(result.ch2State)
+            // Single state update for better performance
+            setDeviceState((prevState) => ({
+              ...prevState,
+              ch1MeasureVoltage: result.ch1Voltage,
+              ch1MeasureCurrent: result.ch1Current,
+              ch2MeasureVoltage: result.ch2Voltage,
+              ch2MeasureCurrent: result.ch2Current,
+              ch1PresetVoltage: result.ch1PresetVoltage,
+              ch1PresetCurrent: result.ch1PresetCurrent,
+              ch2PresetVoltage: result.ch2PresetVoltage,
+              ch2PresetCurrent: result.ch2PresetCurrent,
+              workingMode: result.workingMode,
+              ch1State: result.ch1State,
+              ch2State: result.ch2State
+            }))
           }
         } catch (error) {
-          console.error('Error reading CH1 voltage:', error)
+          console.error('Error reading device state:', error)
         }
       }
-    }, 1000)
+    }, 250)
 
     return () => clearInterval(interval)
   }, [isConnected])
 
   // Update input fields when preset values change
   useEffect(() => {
-    if (ch1PresetVoltage !== null) {
-      setCh1VoltageInput(ch1PresetVoltage.toFixed(2))
+    if (deviceState.ch1PresetVoltage !== null) {
+      setCh1VoltageInput(deviceState.ch1PresetVoltage.toFixed(2))
     }
-    if (ch1PresetCurrent !== null) {
-      setCh1CurrentInput(ch1PresetCurrent.toFixed(3))
+    if (deviceState.ch1PresetCurrent !== null) {
+      setCh1CurrentInput(deviceState.ch1PresetCurrent.toFixed(3))
     }
-    if (ch2PresetVoltage !== null) {
-      setCh2VoltageInput(ch2PresetVoltage.toFixed(2))
+    if (deviceState.ch2PresetVoltage !== null) {
+      setCh2VoltageInput(deviceState.ch2PresetVoltage.toFixed(2))
     }
-    if (ch2PresetCurrent !== null) {
-      setCh2CurrentInput(ch2PresetCurrent.toFixed(3))
+    if (deviceState.ch2PresetCurrent !== null) {
+      setCh2CurrentInput(deviceState.ch2PresetCurrent.toFixed(3))
     }
-  }, [ch1PresetVoltage, ch1PresetCurrent, ch2PresetVoltage, ch2PresetCurrent])
+  }, [
+    deviceState.ch1PresetVoltage,
+    deviceState.ch1PresetCurrent,
+    deviceState.ch2PresetVoltage,
+    deviceState.ch2PresetCurrent
+  ])
 
   // Update selected output mode based on working mode
   useEffect(() => {
-    switch (workingMode) {
+    switch (deviceState.workingMode) {
       case '0000':
         setSelectedOutputMode('independent')
         break
@@ -148,7 +160,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
       default:
         setSelectedOutputMode('independent')
     }
-  }, [workingMode])
+  }, [deviceState.workingMode])
 
   // Helper functions to determine LED states
   const getChannelLEDStates = (channelState) => {
@@ -384,31 +396,35 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {ch1MeasureVoltage !== null ? `${ch1MeasureVoltage.toFixed(2)} V` : '---.-- V'}
+                {deviceState.ch1MeasureVoltage !== null
+                  ? `${deviceState.ch1MeasureVoltage.toFixed(2)} V`
+                  : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {ch1MeasureCurrent !== null ? `${ch1MeasureCurrent.toFixed(3)} A` : '--.--- A'}
+                {deviceState.ch1MeasureCurrent !== null
+                  ? `${deviceState.ch1MeasureCurrent.toFixed(3)} A`
+                  : '--.--- A'}
               </div>
             </div>
           </div>
           <div className="status-indicators gap-2 items-center">
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch1State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
               ></div>
               <div>C.V</div>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch1State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
               ></div>
               <div>OUT</div>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch1State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch1State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
               ></div>
               <div>C.C</div>
             </div>
@@ -420,31 +436,35 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {ch2MeasureVoltage !== null ? `${ch2MeasureVoltage.toFixed(2)} V` : '---.-- V'}
+                {deviceState.ch2MeasureVoltage !== null
+                  ? `${deviceState.ch2MeasureVoltage.toFixed(2)} V`
+                  : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {ch2MeasureCurrent !== null ? `${ch2MeasureCurrent.toFixed(3)} A` : '--.--- A'}
+                {deviceState.ch2MeasureCurrent !== null
+                  ? `${deviceState.ch2MeasureCurrent.toFixed(3)} A`
+                  : '--.--- A'}
               </div>
             </div>
           </div>
           <div className="status-indicators gap-2 items-center">
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch2State).cv ? 'bg-green-500' : 'bg-gray-300'}`}
               ></div>
               <div>C.V</div>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch2State).out ? 'bg-yellow-500' : 'bg-gray-300'}`}
               ></div>
               <div>OUT</div>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(ch2State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
+                className={`status w-4 h-4 rounded-full ${getChannelLEDStates(deviceState.ch2State).cc ? 'bg-red-500' : 'bg-gray-300'}`}
               ></div>
               <div>C.C</div>
             </div>

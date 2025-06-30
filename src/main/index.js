@@ -14,7 +14,7 @@ class SerialCommandQueue {
     this.queue = []
     this.isProcessing = false
     this.currentCommand = null
-    this.commandTimeout = 2000 // 2 second timeout
+    this.commandTimeout = 1000 // Reduced from 2000ms to 1000ms for faster polling
     this.timeoutId = null
   }
 

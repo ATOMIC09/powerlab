@@ -210,6 +210,37 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     }
   }
 
+  // Functions to handle CH3 voltage settings
+  const handleSetCh3_33V = async () => {
+    try {
+      await window.electronAPI.serialSendCommand('o8')
+      console.log('Set CH3 to 3.3V (command: o8)')
+    } catch (error) {
+      console.error('Error setting CH3 to 3.3V:', error)
+      alert('Failed to set CH3 to 3.3V')
+    }
+  }
+
+  const handleSetCh3_5V = async () => {
+    try {
+      await window.electronAPI.serialSendCommand('o9')
+      console.log('Set CH3 to 5V (command: o9)')
+    } catch (error) {
+      console.error('Error setting CH3 to 5V:', error)
+      alert('Failed to set CH3 to 5V')
+    }
+  }
+
+  const handleSetCh3_25V = async () => {
+    try {
+      await window.electronAPI.serialSendCommand('oa')
+      console.log('Set CH3 to 2.5V (command: oa)')
+    } catch (error) {
+      console.error('Error setting CH3 to 2.5V:', error)
+      alert('Failed to set CH3 to 2.5V')
+    }
+  }
+
   return (
     <div className="sidebar p-4 bg-[#edeff3]">
       {/* Serial Port Connection Section */}
@@ -338,29 +369,6 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
             </div>
           </div>
         </div>
-        {/* CH3 Display */}
-        <h4 className="text-2xl font-light">CH3</h4>
-        <div className="ch3-display flex items-center justify-between mb-4">
-          <div className="items-center gap-4">
-            <div>
-              <div className="text-5xl font-light text-right">3.3 V</div>
-            </div>
-          </div>
-          <div className="status-indicators gap-2 items-center">
-            <div className="flex items-center gap-2">
-              <div className="status bg-red-500 w-4 h-4 rounded-full"></div>
-              <div>C.V</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="status bg-green-500 w-4 h-4 rounded-full"></div>
-              <div>C.C</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="status bg-yellow-500 w-4 h-4 rounded-full"></div>
-              <div>OUT</div>
-            </div>
-          </div>
-        </div>
       </div>
       <hr className="my-4" />
 
@@ -472,13 +480,47 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
         <div className="flex flex-col gap-2">
           <div>
             <label>Set Voltage:</label>
-            <select className="w-full p-2 border border-gray-300 rounded">
-              <option value="2.5">2.5V</option>
-              <option value="3.3">3.3V</option>
-              <option value="5">5V</option>
-            </select>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <button
+                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                onClick={handleSetCh3_25V}
+                disabled={!isConnected}
+              >
+                2.5V
+              </button>
+              <button
+                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                onClick={handleSetCh3_33V}
+                disabled={!isConnected}
+              >
+                3.3V
+              </button>
+              <button
+                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                onClick={handleSetCh3_5V}
+                disabled={!isConnected}
+              >
+                5V
+              </button>
+            </div>
           </div>
         </div>
+
+        <div className="flex status-indicators gap-2 items-center justify-center my-4">
+          <div className="flex items-center gap-2">
+            <div className="status bg-red-500 w-4 h-4 rounded-full"></div>
+            <div>C.V</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="status bg-green-500 w-4 h-4 rounded-full"></div>
+            <div>C.C</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="status bg-yellow-500 w-4 h-4 rounded-full"></div>
+            <div>OUT</div>
+          </div>
+        </div>
+
       </div>
       <hr className="my-4" />
 

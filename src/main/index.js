@@ -260,7 +260,8 @@ ipcMain.handle('serial-read-all-values', async () => {
     { key: 'ch2Voltage', command: 'rh' },
     { key: 'ch2Current', command: 'rj' },
     { key: 'ch2PresetVoltage', command: 'rk' },
-    { key: 'ch2PresetCurrent', command: 'rq' }
+    { key: 'ch2PresetCurrent', command: 'rq' },
+    { key: 'workingMode', command: 'rm' }
   ]
 
   const results = {}
@@ -275,16 +276,22 @@ ipcMain.handle('serial-read-all-values', async () => {
         commandQueue.enqueue(cmd.command, resolve, reject)
       })
 
-      // Parse the response (e.g., "1200" -> 12.00 for voltage, "2500" -> 2.500 for current)
-      const numValue = parseInt(response)
-      if (!isNaN(numValue)) {
-        if (cmd.key.includes('Current')) {
-          results[cmd.key] = numValue / 1000 // Convert to Amps (e.g., 2500 -> 2.500A)
-        } else {
-          results[cmd.key] = numValue / 100 // Convert to Volts (e.g., 1200 -> 12.00V)
-        }
+      // Parse the response
+      if (cmd.key === 'workingMode') {
+        // For working mode, keep the response as is (e.g., "0000", "0001", "0016", "0017")
+        results[cmd.key] = response.trim()
       } else {
-        results[cmd.key] = response // Keep original response if not numeric
+        // Parse numeric values for voltage/current
+        const numValue = parseInt(response)
+        if (!isNaN(numValue)) {
+          if (cmd.key.includes('Current')) {
+            results[cmd.key] = numValue / 1000 // Convert to Amps (e.g., 2500 -> 2.500A)
+          } else {
+            results[cmd.key] = numValue / 100 // Convert to Volts (e.g., 1200 -> 12.00V)
+          }
+        } else {
+          results[cmd.key] = response // Keep original response if not numeric
+        }
       }
     }
 

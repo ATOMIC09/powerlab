@@ -22,6 +22,7 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
   const [ch2CurrentInput, setCh2CurrentInput] = useState('')
 
   const [workingMode, setWorkingMode] = useState('0000') // 0000: Independent, 0017: SER, 0001: PARA, 0016: TRACK
+  const [selectedOutputMode, setSelectedOutputMode] = useState('independent')
   const [lockState, setLockState] = useState('0000') // 0000: Unlocked, 0001: Locked
   const [ch1State, setCh1State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
   const [ch2State, setCh2State] = useState('0000') // 0000: OFF, 0001: ON C.V, 0016: ON C.C
@@ -133,6 +134,26 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     }
   }, [ch1PresetVoltage, ch1PresetCurrent, ch2PresetVoltage, ch2PresetCurrent])
 
+  // Update selected output mode based on working mode
+  useEffect(() => {
+    switch (workingMode) {
+      case '0000':
+        setSelectedOutputMode('independent')
+        break
+      case '0017':
+        setSelectedOutputMode('ser')
+        break
+      case '0001':
+        setSelectedOutputMode('para')
+        break
+      case '0016':
+        setSelectedOutputMode('track')
+        break
+      default:
+        setSelectedOutputMode('independent')
+    }
+  }, [workingMode])
+
   // Functions to handle setting preset values
   const handleSetCh1Voltage = async () => {
     const voltage = parseFloat(ch1VoltageInput)
@@ -238,6 +259,28 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
     } catch (error) {
       console.error('Error setting CH3 to 2.5V:', error)
       alert('Failed to set CH3 to 2.5V')
+    }
+  }
+
+  // Function to handle output mode changes
+  const handleOutputModeChange = async (mode) => {
+    const commands = {
+      independent: 'o2',
+      para: 'o3',
+      ser: 'o5',
+      track: 'o4'
+    }
+
+    try {
+      const command = commands[mode]
+      if (command) {
+        await window.electronAPI.serialSendCommand(command)
+        console.log(`Set output mode to ${mode.toUpperCase()} (command: ${command})`)
+        setSelectedOutputMode(mode)
+      }
+    } catch (error) {
+      console.error('Error setting output mode:', error)
+      alert('Failed to set output mode')
     }
   }
 
@@ -520,14 +563,18 @@ export default function Sidebar({ isConnected, setIsConnected, selectedPort, set
             <div>OUT</div>
           </div>
         </div>
-
       </div>
       <hr className="my-4" />
 
       {/* Output Mode Section */}
       <div className="output-mode mb-4">
         <h3>Output Mode</h3>
-        <select className="w-full p-2 border border-gray-300 rounded">
+        <select
+          className="w-full p-2 border border-gray-300 rounded"
+          value={selectedOutputMode}
+          onChange={(e) => handleOutputModeChange(e.target.value)}
+          disabled={!isConnected}
+        >
           <option value="independent">Independent Output</option>
           <option value="ser">SER Output</option>
           <option value="para">PARA Output</option>

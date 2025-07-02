@@ -103,6 +103,13 @@ export default function SerialMonitor() {
     }
   }, [])
 
+  // Auto-scroll to the last message whenever the logs state changes
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [logs])
+
   // Function to get log entry styling based on type
   const getLogStyle = (type) => {
     switch (type) {

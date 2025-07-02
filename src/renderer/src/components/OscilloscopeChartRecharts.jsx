@@ -132,7 +132,6 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
     // Assuming state code format where specific bits indicate C.C or C.V mode
     // You may need to adjust this based on your device's actual state encoding
     if (!stateCode || stateCode === '0000') return 'OFF'
-    
     // Common patterns for power supply states:
     // This is a placeholder - adjust based on your device's actual state encoding
     const state = parseInt(stateCode, 16)

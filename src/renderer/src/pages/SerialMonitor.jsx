@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function SerialMonitor() {
   const [logs, setLogs] = useState([])
   const [message, setMessage] = useState('')
-  const [isConnected, setIsConnected] = useState(false)
   const logsEndRef = useRef(null)
   const dataBufferRef = useRef('') // Buffer to accumulate incoming data
 
@@ -30,16 +29,16 @@ export default function SerialMonitor() {
     if (!message.trim()) return
 
     try {
-      const result = await window.electronAPI.serialSend(message)
-      if (result === 'sent') {
-        addLog(message, 'sent')
-        setMessage('')
-      } else {
-        addLog(`Failed to send: ${result}`, 'error')
+      const result = await window.electronAPI.serialSendCommand(message)
+      // if got result, successfully sent, if not throw error
+      if (result) {
+        addLog(`Sent: ${message}`, 'sent')
+        setMessage('') // Clear input field after sending
+        addLog(`Response: ${result}`, 'received')
       }
     } catch (error) {
-      console.error('Error sending message:', error)
       addLog(`Error sending message: ${error.message}`, 'error')
+      console.error('Error sending message:', error)
     }
   }
 

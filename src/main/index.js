@@ -230,14 +230,6 @@ ipcMain.handle('serial-open', async (_, portPath, baudRate = 9600) => {
   }
 })
 
-ipcMain.handle('serial-send', async (_, message) => {
-  if (port && port.isOpen) {
-    port.write(message + '\n')
-    return 'sent'
-  }
-  return 'port not open'
-})
-
 // New queue-based command handler
 ipcMain.handle('serial-send-command', async (_, command) => {
   return new Promise((resolve, reject) => {

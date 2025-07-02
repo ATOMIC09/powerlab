@@ -312,7 +312,7 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded text-sm font-medium cursor-pointer transition-all  ${
               isPaused
                 ? 'bg-green-500 hover:bg-green-600 text-white'
                 : 'bg-yellow-500 hover:bg-yellow-600 text-white'
@@ -322,13 +322,13 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
           </button>
           <button
             onClick={clearChart}
-            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium transition-colors"
+            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium cursor-pointer transition-all"
           >
             Clear
           </button>
           <button
             onClick={exportToCSV}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded text-sm font-medium cursor-pointer transition-all ${
               chartData.length === 0
                 ? 'bg-gray-400 cursor-not-allowed text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'

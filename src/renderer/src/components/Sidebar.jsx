@@ -349,7 +349,7 @@ export default function Sidebar({
             )}
           </select>
           <button
-            className="p-2 text-gray-700 border border-gray-300 rounded cursor-pointer hover:bg-gray-50"
+            className="p-2 text-gray-700 border border-gray-300 rounded cursor-pointer hover:bg-gray-50 transition-all"
             onClick={fetchComPorts}
             title="Refresh ports"
           >

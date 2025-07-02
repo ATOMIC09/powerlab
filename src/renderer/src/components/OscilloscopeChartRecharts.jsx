@@ -15,7 +15,7 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
   const [timeWindow, setTimeWindow] = useState(10) // seconds
   const [maxDataPoints, setMaxDataPoints] = useState(40) // ~4 data points per second for 60s
   const [isPaused, setIsPaused] = useState(false)
-  const [startTime] = useState(Date.now()) // Reference time for left-to-right movement
+  const [startTime, setStartTime] = useState(Date.now()) // Reference time for left-to-right movement
 
   // Parameter selection states
   const [selectedParams, setSelectedParams] = useState({
@@ -109,6 +109,7 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
   // Clear chart data
   const clearChart = () => {
     setChartData([])
+    setStartTime(Date.now()) // Reset start time to current time
     // Reset statistics
     setStatistics({
       ch1Voltage: { avg: 0, min: 0, max: 0, rms: 0, count: 0 },

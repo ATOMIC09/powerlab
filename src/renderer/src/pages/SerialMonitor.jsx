@@ -106,7 +106,7 @@ export default function SerialMonitor() {
   // Auto-scroll to the last message whenever the logs state changes
   useEffect(() => {
     if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }, [logs])
 

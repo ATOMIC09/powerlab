@@ -1,8 +1,9 @@
 <p align="center">
-  <img src="ggg" alt="Icon" width="150" height="150">
+  <img src="https://github.com/user-attachments/assets/d52875d0-e908-455d-8d1f-a4fb96ca0acf" alt="Icon" width="150" height="150">
     <div align="center">
       <h1 align="center">PowerLab</h1>
-      <img src="https://img.shields.io/github/license/ATOMIC09/powerlab">
+      <img alt="Download" src="https://img.shields.io/github/downloads/ATOMIC09/powerlab/total" />
+      <img alt="License" src="https://img.shields.io/github/license/ATOMIC09/powerlab">
     </div>
 </p>
 

@@ -76,7 +76,9 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
         ch1Voltage: deviceState.ch1MeasureVoltage || 0,
         ch2Voltage: deviceState.ch2MeasureVoltage || 0,
         ch1Current: deviceState.ch1MeasureCurrent || 0,
-        ch2Current: deviceState.ch2MeasureCurrent || 0
+        ch2Current: deviceState.ch2MeasureCurrent || 0,
+        ch1State: deviceState.ch1State || '0000',
+        ch2State: deviceState.ch2State || '0000'
       }
 
       newData.push(newPoint)
@@ -123,6 +125,78 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
   const handleTimeWindowChange = (newWindow) => {
     setTimeWindow(newWindow)
     setMaxDataPoints(newWindow * 4) // Approximately 4 data points per second
+  }
+
+  // Helper function to decode channel state to C.C/C.V status
+  const getChannelStatus = (stateCode) => {
+    // Assuming state code format where specific bits indicate C.C or C.V mode
+    // You may need to adjust this based on your device's actual state encoding
+    if (!stateCode || stateCode === '0000') return 'OFF'
+    
+    // Common patterns for power supply states:
+    // This is a placeholder - adjust based on your device's actual state encoding
+    const state = parseInt(stateCode, 16)
+    if (state & 0x01) return 'C.V' // Constant Voltage mode
+    if (state & 0x02) return 'C.C' // Constant Current mode
+    return 'ON' // Some other active state
+  }
+
+  // Export data to CSV
+  const exportToCSV = () => {
+    if (chartData.length === 0) {
+      alert('No data to export. Please record some measurements first.')
+      return
+    }
+
+    // Create CSV header
+    const headers = ['Time (s)']
+    if (selectedParams.showCH1) {
+      headers.push('CH1 Voltage (V)', 'CH1 Current (A)', 'CH1 Status')
+    }
+    if (selectedParams.showCH2) {
+      headers.push('CH2 Voltage (V)', 'CH2 Current (A)', 'CH2 Status')
+    }
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(','),
+      ...chartData.map((point) => {
+        const row = [point.time.toFixed(3)]
+        if (selectedParams.showCH1) {
+          row.push(
+            point.ch1Voltage.toFixed(3),
+            point.ch1Current.toFixed(6),
+            getChannelStatus(point.ch1State)
+          )
+        }
+        if (selectedParams.showCH2) {
+          row.push(
+            point.ch2Voltage.toFixed(3),
+            point.ch2Current.toFixed(6),
+            getChannelStatus(point.ch2State)
+          )
+        }
+        return row.join(',')
+      })
+    ].join('\n')
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+
+    // Generate filename with timestamp
+    const now = new Date()
+    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    const filename = `power-measurement-${timestamp}.csv`
+
+    link.setAttribute('download', filename)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   // Custom tooltip formatter
@@ -252,6 +326,20 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
             className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium transition-colors"
           >
             Clear
+          </button>
+          <button
+            onClick={exportToCSV}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              chartData.length === 0
+                ? 'bg-gray-400 cursor-not-allowed text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+            disabled={chartData.length === 0}
+            title={
+              chartData.length === 0 ? 'No data to export' : 'Export current chart data to CSV'
+            }
+          >
+            Export CSV
           </button>
         </div>
 
@@ -483,7 +571,9 @@ OscilloscopeChartRecharts.propTypes = {
     ch1MeasureVoltage: PropTypes.number,
     ch2MeasureVoltage: PropTypes.number,
     ch1MeasureCurrent: PropTypes.number,
-    ch2MeasureCurrent: PropTypes.number
+    ch2MeasureCurrent: PropTypes.number,
+    ch1State: PropTypes.string,
+    ch2State: PropTypes.string
   })
 }
 

@@ -20,7 +20,9 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
   // Parameter selection states
   const [selectedParams, setSelectedParams] = useState({
     showVoltage: true,
-    showCurrent: true
+    showCurrent: true,
+    showCH1: true,
+    showCH2: true
   })
 
   // Chart data - single array with all measurements
@@ -205,6 +207,34 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
           </label>
         </div>
 
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700">Channels:</label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={selectedParams.showCH1}
+              onChange={(e) => handleParameterChange('showCH1', e.target.checked)}
+              className="rounded"
+            />
+            <span className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
+              CH1
+            </span>
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={selectedParams.showCH2}
+              onChange={(e) => handleParameterChange('showCH2', e.target.checked)}
+              className="rounded"
+            />
+            <span className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-red-500 rounded mr-1"></div>
+              CH2
+            </span>
+          </label>
+        </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPaused(!isPaused)}
@@ -254,26 +284,30 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
                 <YAxis stroke="#666" tickFormatter={(value) => `${value.toFixed(1)}V`} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="ch1Voltage"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  name="CH1 Voltage"
-                  dot={false}
-                  connectNulls={false}
-                  isAnimationActive={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="ch2Voltage"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                  name="CH2 Voltage"
-                  dot={false}
-                  connectNulls={false}
-                  isAnimationActive={false}
-                />
+                {selectedParams.showCH1 && (
+                  <Line
+                    type="monotone"
+                    dataKey="ch1Voltage"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    name="CH1 Voltage"
+                    dot={false}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                )}
+                {selectedParams.showCH2 && (
+                  <Line
+                    type="monotone"
+                    dataKey="ch2Voltage"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    name="CH2 Voltage"
+                    dot={false}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                )}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -296,61 +330,74 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
                 <YAxis stroke="#666" tickFormatter={(value) => `${value.toFixed(3)}A`} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="ch1Current"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  name="CH1 Current"
-                  dot={false}
-                  connectNulls={false}
-                  isAnimationActive={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="ch2Current"
-                  stroke="#f59e0b"
-                  strokeWidth={2}
-                  name="CH2 Current"
-                  dot={false}
-                  connectNulls={false}
-                  isAnimationActive={false}
-                />
+                {selectedParams.showCH1 && (
+                  <Line
+                    type="monotone"
+                    dataKey="ch1Current"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    name="CH1 Current"
+                    dot={false}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                )}
+                {selectedParams.showCH2 && (
+                  <Line
+                    type="monotone"
+                    dataKey="ch2Current"
+                    stroke="#f59e0b"
+                    strokeWidth={2}
+                    name="CH2 Current"
+                    dot={false}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                )}
               </LineChart>
             </ResponsiveContainer>
           </div>
         )}
 
-        {!selectedParams.showVoltage && !selectedParams.showCurrent && (
+        {(!selectedParams.showVoltage && !selectedParams.showCurrent) ||
+        (!selectedParams.showCH1 && !selectedParams.showCH2) ? (
           <div className="no-charts-message flex items-center justify-center h-64 text-gray-500">
-            <p>Select at least one chart to display data</p>
+            <p>
+              {!selectedParams.showVoltage && !selectedParams.showCurrent
+                ? 'Select at least one chart to display data'
+                : 'Select at least one channel to display data'}
+            </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="legend-details mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div className="ch1-info">
-          <h4 className="font-semibold text-gray-700 mb-2">Channel 1</h4>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span>Voltage: {deviceState?.ch1MeasureVoltage?.toFixed(2) || '---.--'} V</span>
+        {selectedParams.showCH1 && (
+          <div className="ch1-info">
+            <h4 className="font-semibold text-gray-700 mb-2">Channel 1</h4>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 bg-blue-500 rounded"></div>
+              <span>Voltage: {deviceState?.ch1MeasureVoltage?.toFixed(2) || '---.--'} V</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-emerald-500 rounded"></div>
+              <span>Current: {deviceState?.ch1MeasureCurrent?.toFixed(3) || '--.---'} A</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-emerald-500 rounded"></div>
-            <span>Current: {deviceState?.ch1MeasureCurrent?.toFixed(3) || '--.---'} A</span>
+        )}
+        {selectedParams.showCH2 && (
+          <div className="ch2-info">
+            <h4 className="font-semibold text-gray-700 mb-2">Channel 2</h4>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 bg-red-500 rounded"></div>
+              <span>Voltage: {deviceState?.ch2MeasureVoltage?.toFixed(2) || '---.--'} V</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-amber-500 rounded"></div>
+              <span>Current: {deviceState?.ch2MeasureCurrent?.toFixed(3) || '--.---'} A</span>
+            </div>
           </div>
-        </div>
-        <div className="ch2-info">
-          <h4 className="font-semibold text-gray-700 mb-2">Channel 2</h4>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span>Voltage: {deviceState?.ch2MeasureVoltage?.toFixed(2) || '---.--'} V</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-amber-500 rounded"></div>
-            <span>Current: {deviceState?.ch2MeasureCurrent?.toFixed(3) || '--.---'} A</span>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="statistics-section mt-6">
@@ -363,26 +410,30 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
               Voltage Statistics
             </h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="ch1-voltage-stats">
-                <h5 className="font-medium text-blue-600 mb-2">Channel 1</h5>
-                <div className="space-y-1">
-                  <div>Avg: {statistics.ch1Voltage.avg.toFixed(3)} V</div>
-                  <div>Min: {statistics.ch1Voltage.min.toFixed(3)} V</div>
-                  <div>Max: {statistics.ch1Voltage.max.toFixed(3)} V</div>
-                  <div>RMS: {statistics.ch1Voltage.rms.toFixed(3)} V</div>
-                  <div>Points: {statistics.ch1Voltage.count}</div>
+              {selectedParams.showCH1 && (
+                <div className="ch1-voltage-stats">
+                  <h5 className="font-medium text-blue-600 mb-2">Channel 1</h5>
+                  <div className="space-y-1">
+                    <div>Avg: {statistics.ch1Voltage.avg.toFixed(3)} V</div>
+                    <div>Min: {statistics.ch1Voltage.min.toFixed(3)} V</div>
+                    <div>Max: {statistics.ch1Voltage.max.toFixed(3)} V</div>
+                    <div>RMS: {statistics.ch1Voltage.rms.toFixed(3)} V</div>
+                    <div>Points: {statistics.ch1Voltage.count}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="ch2-voltage-stats">
-                <h5 className="font-medium text-red-600 mb-2">Channel 2</h5>
-                <div className="space-y-1">
-                  <div>Avg: {statistics.ch2Voltage.avg.toFixed(3)} V</div>
-                  <div>Min: {statistics.ch2Voltage.min.toFixed(3)} V</div>
-                  <div>Max: {statistics.ch2Voltage.max.toFixed(3)} V</div>
-                  <div>RMS: {statistics.ch2Voltage.rms.toFixed(3)} V</div>
-                  <div>Points: {statistics.ch2Voltage.count}</div>
+              )}
+              {selectedParams.showCH2 && (
+                <div className="ch2-voltage-stats">
+                  <h5 className="font-medium text-red-600 mb-2">Channel 2</h5>
+                  <div className="space-y-1">
+                    <div>Avg: {statistics.ch2Voltage.avg.toFixed(3)} V</div>
+                    <div>Min: {statistics.ch2Voltage.min.toFixed(3)} V</div>
+                    <div>Max: {statistics.ch2Voltage.max.toFixed(3)} V</div>
+                    <div>RMS: {statistics.ch2Voltage.rms.toFixed(3)} V</div>
+                    <div>Points: {statistics.ch2Voltage.count}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -393,26 +444,30 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
               Current Statistics
             </h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="ch1-current-stats">
-                <h5 className="font-medium text-emerald-600 mb-2">Channel 1</h5>
-                <div className="space-y-1">
-                  <div>Avg: {statistics.ch1Current.avg.toFixed(4)} A</div>
-                  <div>Min: {statistics.ch1Current.min.toFixed(4)} A</div>
-                  <div>Max: {statistics.ch1Current.max.toFixed(4)} A</div>
-                  <div>RMS: {statistics.ch1Current.rms.toFixed(4)} A</div>
-                  <div>Points: {statistics.ch1Current.count}</div>
+              {selectedParams.showCH1 && (
+                <div className="ch1-current-stats">
+                  <h5 className="font-medium text-emerald-600 mb-2">Channel 1</h5>
+                  <div className="space-y-1">
+                    <div>Avg: {statistics.ch1Current.avg.toFixed(4)} A</div>
+                    <div>Min: {statistics.ch1Current.min.toFixed(4)} A</div>
+                    <div>Max: {statistics.ch1Current.max.toFixed(4)} A</div>
+                    <div>RMS: {statistics.ch1Current.rms.toFixed(4)} A</div>
+                    <div>Points: {statistics.ch1Current.count}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="ch2-current-stats">
-                <h5 className="font-medium text-amber-600 mb-2">Channel 2</h5>
-                <div className="space-y-1">
-                  <div>Avg: {statistics.ch2Current.avg.toFixed(4)} A</div>
-                  <div>Min: {statistics.ch2Current.min.toFixed(4)} A</div>
-                  <div>Max: {statistics.ch2Current.max.toFixed(4)} A</div>
-                  <div>RMS: {statistics.ch2Current.rms.toFixed(4)} A</div>
-                  <div>Points: {statistics.ch2Current.count}</div>
+              )}
+              {selectedParams.showCH2 && (
+                <div className="ch2-current-stats">
+                  <h5 className="font-medium text-amber-600 mb-2">Channel 2</h5>
+                  <div className="space-y-1">
+                    <div>Avg: {statistics.ch2Current.avg.toFixed(4)} A</div>
+                    <div>Min: {statistics.ch2Current.min.toFixed(4)} A</div>
+                    <div>Max: {statistics.ch2Current.max.toFixed(4)} A</div>
+                    <div>RMS: {statistics.ch2Current.rms.toFixed(4)} A</div>
+                    <div>Points: {statistics.ch2Current.count}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

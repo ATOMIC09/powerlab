@@ -11,6 +11,8 @@
 
 PowerLab is an Electron application built with React for monitoring and controlling serial-connected devices. It features a serial monitor, oscilloscope chart, and device control interface.
 
+![image](https://github.com/user-attachments/assets/fad12f45-a830-41e6-833d-154eda4fb21b)
+
 <br>
 
 ## Supported Device

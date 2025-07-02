@@ -1,7 +1,7 @@
 {
   "name": "powerlab",
   "version": "1.0.0",
-  "description": "An Electron application to log power and control the power supply using a serial connection.",
+  "description": "Power logger and control application for Hantek programmable power supply",
   "main": "./out/main/index.js",
   "author": "ATOMIC09",
   "scripts": {

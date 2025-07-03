@@ -1,5 +1,5 @@
 appId: com.atomic09.powerlab
-productName: powerlab
+productName: PowerLab
 directories:
   buildResources: build
 files:
@@ -11,7 +11,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: powerlab
+  executableName: PowerLab
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

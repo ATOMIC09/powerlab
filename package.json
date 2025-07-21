@@ -1,6 +1,6 @@
 {
   "name": "powerlab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Power logger and control application for Hantek programmable power supply",
   "main": "./out/main/index.js",
   "author": "ATOMIC09",

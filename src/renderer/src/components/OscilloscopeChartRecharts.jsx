@@ -465,11 +465,25 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
             <h4 className="font-semibold text-gray-700 mb-2">Channel 1</h4>
             <div className="flex items-center gap-2 mb-1">
               <div className="w-3 h-3 bg-blue-500 rounded"></div>
-              <span>Voltage: {typeof deviceState?.ch1MeasureVoltage === 'number' && !isNaN(deviceState.ch1MeasureVoltage) ? deviceState.ch1MeasureVoltage.toFixed(2) : '---.--'} V</span>
+              <span>
+                Voltage:{' '}
+                {typeof deviceState?.ch1MeasureVoltage === 'number' &&
+                !isNaN(deviceState.ch1MeasureVoltage)
+                  ? deviceState.ch1MeasureVoltage.toFixed(2)
+                  : '---.--'}{' '}
+                V
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-emerald-500 rounded"></div>
-              <span>Current: {typeof deviceState?.ch1MeasureCurrent === 'number' && !isNaN(deviceState.ch1MeasureCurrent) ? deviceState.ch1MeasureCurrent.toFixed(3) : '--.---'} A</span>
+              <span>
+                Current:{' '}
+                {typeof deviceState?.ch1MeasureCurrent === 'number' &&
+                !isNaN(deviceState.ch1MeasureCurrent)
+                  ? deviceState.ch1MeasureCurrent.toFixed(3)
+                  : '--.---'}{' '}
+                A
+              </span>
             </div>
           </div>
         )}
@@ -478,11 +492,25 @@ const OscilloscopeChartRecharts = ({ isConnected, deviceState }) => {
             <h4 className="font-semibold text-gray-700 mb-2">Channel 2</h4>
             <div className="flex items-center gap-2 mb-1">
               <div className="w-3 h-3 bg-red-500 rounded"></div>
-              <span>Voltage: {typeof deviceState?.ch2MeasureVoltage === 'number' && !isNaN(deviceState.ch2MeasureVoltage) ? deviceState.ch2MeasureVoltage.toFixed(2) : '---.--'} V</span>
+              <span>
+                Voltage:{' '}
+                {typeof deviceState?.ch2MeasureVoltage === 'number' &&
+                !isNaN(deviceState.ch2MeasureVoltage)
+                  ? deviceState.ch2MeasureVoltage.toFixed(2)
+                  : '---.--'}{' '}
+                V
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-amber-500 rounded"></div>
-              <span>Current: {typeof deviceState?.ch2MeasureCurrent === 'number' && !isNaN(deviceState.ch2MeasureCurrent) ? deviceState.ch2MeasureCurrent.toFixed(3) : '--.---'} A</span>
+              <span>
+                Current:{' '}
+                {typeof deviceState?.ch2MeasureCurrent === 'number' &&
+                !isNaN(deviceState.ch2MeasureCurrent)
+                  ? deviceState.ch2MeasureCurrent.toFixed(3)
+                  : '--.---'}{' '}
+                A
+              </span>
             </div>
           </div>
         )}

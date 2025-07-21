@@ -123,16 +123,32 @@ export default function Sidebar({
 
   // Update input fields when preset values change, but only if not dirty
   useEffect(() => {
-    if (!ch1VoltageDirty && typeof deviceState?.ch1PresetVoltage === 'number' && !isNaN(deviceState.ch1PresetVoltage)) {
+    if (
+      !ch1VoltageDirty &&
+      typeof deviceState?.ch1PresetVoltage === 'number' &&
+      !isNaN(deviceState.ch1PresetVoltage)
+    ) {
       setCh1VoltageInput(deviceState.ch1PresetVoltage.toFixed(2))
     }
-    if (!ch1CurrentDirty && typeof deviceState?.ch1PresetCurrent === 'number' && !isNaN(deviceState.ch1PresetCurrent)) {
+    if (
+      !ch1CurrentDirty &&
+      typeof deviceState?.ch1PresetCurrent === 'number' &&
+      !isNaN(deviceState.ch1PresetCurrent)
+    ) {
       setCh1CurrentInput(deviceState.ch1PresetCurrent.toFixed(3))
     }
-    if (!ch2VoltageDirty && typeof deviceState?.ch2PresetVoltage === 'number' && !isNaN(deviceState.ch2PresetVoltage)) {
+    if (
+      !ch2VoltageDirty &&
+      typeof deviceState?.ch2PresetVoltage === 'number' &&
+      !isNaN(deviceState.ch2PresetVoltage)
+    ) {
       setCh2VoltageInput(deviceState.ch2PresetVoltage.toFixed(2))
     }
-    if (!ch2CurrentDirty && typeof deviceState?.ch2PresetCurrent === 'number' && !isNaN(deviceState.ch2PresetCurrent)) {
+    if (
+      !ch2CurrentDirty &&
+      typeof deviceState?.ch2PresetCurrent === 'number' &&
+      !isNaN(deviceState.ch2PresetCurrent)
+    ) {
       setCh2CurrentInput(deviceState.ch2PresetCurrent.toFixed(3))
     }
   }, [
@@ -333,12 +349,14 @@ export default function Sidebar({
         <h3 className="text-lg font-medium mb-3">Serial Connection</h3>
         {/* Fetch Interval Dropdown */}
         <div className="mb-3 flex items-center gap-2">
-          <label htmlFor="fetch-interval" className="text-sm text-gray-700">Polling Rate:</label>
+          <label htmlFor="fetch-interval" className="text-sm text-gray-700">
+            Polling Rate:
+          </label>
           <select
             id="fetch-interval"
             className="py-1 px-2 border border-gray-300 rounded"
             value={fetchInterval}
-            onChange={e => setFetchInterval(Number(e.target.value))}
+            onChange={(e) => setFetchInterval(Number(e.target.value))}
           >
             <option value={250}>250 ms</option>
             <option value={500}>500 ms</option>
@@ -415,14 +433,16 @@ export default function Sidebar({
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {typeof deviceState?.ch1MeasureVoltage === 'number' && !isNaN(deviceState.ch1MeasureVoltage)
+                {typeof deviceState?.ch1MeasureVoltage === 'number' &&
+                !isNaN(deviceState.ch1MeasureVoltage)
                   ? `${deviceState.ch1MeasureVoltage.toFixed(2)} V`
                   : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {typeof deviceState?.ch1MeasureCurrent === 'number' && !isNaN(deviceState.ch1MeasureCurrent)
+                {typeof deviceState?.ch1MeasureCurrent === 'number' &&
+                !isNaN(deviceState.ch1MeasureCurrent)
                   ? `${deviceState.ch1MeasureCurrent.toFixed(3)} A`
                   : '--.--- A'}
               </div>
@@ -455,14 +475,16 @@ export default function Sidebar({
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {typeof deviceState?.ch2MeasureVoltage === 'number' && !isNaN(deviceState.ch2MeasureVoltage)
+                {typeof deviceState?.ch2MeasureVoltage === 'number' &&
+                !isNaN(deviceState.ch2MeasureVoltage)
                   ? `${deviceState.ch2MeasureVoltage.toFixed(2)} V`
                   : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {typeof deviceState?.ch2MeasureCurrent === 'number' && !isNaN(deviceState.ch2MeasureCurrent)
+                {typeof deviceState?.ch2MeasureCurrent === 'number' &&
+                !isNaN(deviceState.ch2MeasureCurrent)
                   ? `${deviceState.ch2MeasureCurrent.toFixed(3)} A`
                   : '--.--- A'}
               </div>

@@ -40,7 +40,7 @@ The application uses commands derived from the Python implementation available a
 
 You can download the latest release of PowerLab from the [Releases](https://github.com/ATOMIC09/powerlab/releases) page. or click the link below:
 
-- [`Download for Windows (v1.0)`](https://github.com/ATOMIC09/powerlab/releases/download/v1.0/powerlab-1.0.0-windows-x86_64.exe)
+- [`Download for Windows (v1.0.1)`](https://github.com/ATOMIC09/powerlab/releases/download/v1.0.1/powerlab-1.0.1-windows-x86_64.exe)
 
 <br>
 

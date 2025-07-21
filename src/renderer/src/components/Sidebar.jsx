@@ -19,7 +19,16 @@ export default function Sidebar({
   const [ch2VoltageInput, setCh2VoltageInput] = useState('')
   const [ch2CurrentInput, setCh2CurrentInput] = useState('')
 
+  // Dirty state for each input
+  const [ch1VoltageDirty, setCh1VoltageDirty] = useState(false)
+  const [ch1CurrentDirty, setCh1CurrentDirty] = useState(false)
+  const [ch2VoltageDirty, setCh2VoltageDirty] = useState(false)
+  const [ch2CurrentDirty, setCh2CurrentDirty] = useState(false)
+
   const [selectedOutputMode, setSelectedOutputMode] = useState('independent')
+
+  // State for fetch interval
+  const [fetchInterval, setFetchInterval] = useState(500)
 
   // Function to fetch COM ports
   const fetchComPorts = async () => {
@@ -107,30 +116,34 @@ export default function Sidebar({
           console.error('Error reading device state:', error)
         }
       }
-    }, 250)
+    }, fetchInterval)
 
     return () => clearInterval(interval)
-  }, [isConnected, setDeviceState])
+  }, [isConnected, setDeviceState, fetchInterval])
 
-  // Update input fields when preset values change
+  // Update input fields when preset values change, but only if not dirty
   useEffect(() => {
-    if (deviceState?.ch1PresetVoltage !== null) {
+    if (!ch1VoltageDirty && typeof deviceState?.ch1PresetVoltage === 'number' && !isNaN(deviceState.ch1PresetVoltage)) {
       setCh1VoltageInput(deviceState.ch1PresetVoltage.toFixed(2))
     }
-    if (deviceState?.ch1PresetCurrent !== null) {
+    if (!ch1CurrentDirty && typeof deviceState?.ch1PresetCurrent === 'number' && !isNaN(deviceState.ch1PresetCurrent)) {
       setCh1CurrentInput(deviceState.ch1PresetCurrent.toFixed(3))
     }
-    if (deviceState?.ch2PresetVoltage !== null) {
+    if (!ch2VoltageDirty && typeof deviceState?.ch2PresetVoltage === 'number' && !isNaN(deviceState.ch2PresetVoltage)) {
       setCh2VoltageInput(deviceState.ch2PresetVoltage.toFixed(2))
     }
-    if (deviceState?.ch2PresetCurrent !== null) {
+    if (!ch2CurrentDirty && typeof deviceState?.ch2PresetCurrent === 'number' && !isNaN(deviceState.ch2PresetCurrent)) {
       setCh2CurrentInput(deviceState.ch2PresetCurrent.toFixed(3))
     }
   }, [
     deviceState?.ch1PresetVoltage,
     deviceState?.ch1PresetCurrent,
     deviceState?.ch2PresetVoltage,
-    deviceState?.ch2PresetCurrent
+    deviceState?.ch2PresetCurrent,
+    ch1VoltageDirty,
+    ch1CurrentDirty,
+    ch2VoltageDirty,
+    ch2CurrentDirty
   ])
 
   // Update selected output mode based on working mode
@@ -318,6 +331,21 @@ export default function Sidebar({
       {/* Serial Port Connection Section */}
       <div className="serial-connection mb-4 p-3 bg-white rounded-lg shadow-sm">
         <h3 className="text-lg font-medium mb-3">Serial Connection</h3>
+        {/* Fetch Interval Dropdown */}
+        <div className="mb-3 flex items-center gap-2">
+          <label htmlFor="fetch-interval" className="text-sm text-gray-700">Polling Rate:</label>
+          <select
+            id="fetch-interval"
+            className="py-1 px-2 border border-gray-300 rounded"
+            value={fetchInterval}
+            onChange={e => setFetchInterval(Number(e.target.value))}
+          >
+            <option value={250}>250 ms</option>
+            <option value={500}>500 ms</option>
+            <option value={750}>750 ms</option>
+            <option value={1000}>1000 ms</option>
+          </select>
+        </div>
 
         {/* Port Selection */}
         <div className="flex gap-2 mb-3">
@@ -387,14 +415,14 @@ export default function Sidebar({
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState?.ch1MeasureVoltage !== null
+                {typeof deviceState?.ch1MeasureVoltage === 'number' && !isNaN(deviceState.ch1MeasureVoltage)
                   ? `${deviceState.ch1MeasureVoltage.toFixed(2)} V`
                   : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState?.ch1MeasureCurrent !== null
+                {typeof deviceState?.ch1MeasureCurrent === 'number' && !isNaN(deviceState.ch1MeasureCurrent)
                   ? `${deviceState.ch1MeasureCurrent.toFixed(3)} A`
                   : '--.--- A'}
               </div>
@@ -427,14 +455,14 @@ export default function Sidebar({
           <div className="items-center gap-4">
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState.ch2MeasureVoltage !== null
+                {typeof deviceState?.ch2MeasureVoltage === 'number' && !isNaN(deviceState.ch2MeasureVoltage)
                   ? `${deviceState.ch2MeasureVoltage.toFixed(2)} V`
                   : '---.-- V'}
               </div>
             </div>
             <div>
               <div className="text-5xl font-light text-right">
-                {deviceState.ch2MeasureCurrent !== null
+                {typeof deviceState?.ch2MeasureCurrent === 'number' && !isNaN(deviceState.ch2MeasureCurrent)
                   ? `${deviceState.ch2MeasureCurrent.toFixed(3)} A`
                   : '--.--- A'}
               </div>
@@ -476,14 +504,20 @@ export default function Sidebar({
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
                 value={ch1VoltageInput}
-                onChange={(e) => setCh1VoltageInput(e.target.value)}
+                onChange={(e) => {
+                  setCh1VoltageInput(e.target.value)
+                  setCh1VoltageDirty(true)
+                }}
                 disabled={!isConnected}
                 step="0.01"
                 min="0"
               />
               <button
-                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleSetCh1Voltage}
+                className={`p-2 ${ch1VoltageDirty ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-blue-500 hover:bg-blue-600'} transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                onClick={async () => {
+                  await handleSetCh1Voltage()
+                  setCh1VoltageDirty(false)
+                }}
                 disabled={!isConnected}
               >
                 Apply
@@ -498,14 +532,20 @@ export default function Sidebar({
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
                 value={ch1CurrentInput}
-                onChange={(e) => setCh1CurrentInput(e.target.value)}
+                onChange={(e) => {
+                  setCh1CurrentInput(e.target.value)
+                  setCh1CurrentDirty(true)
+                }}
                 disabled={!isConnected}
                 step="0.001"
                 min="0"
               />
               <button
-                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleSetCh1Current}
+                className={`p-2 ${ch1CurrentDirty ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-blue-500 hover:bg-blue-600'} transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                onClick={async () => {
+                  await handleSetCh1Current()
+                  setCh1CurrentDirty(false)
+                }}
                 disabled={!isConnected}
               >
                 Apply
@@ -527,14 +567,20 @@ export default function Sidebar({
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter voltage"
                 value={ch2VoltageInput}
-                onChange={(e) => setCh2VoltageInput(e.target.value)}
+                onChange={(e) => {
+                  setCh2VoltageInput(e.target.value)
+                  setCh2VoltageDirty(true)
+                }}
                 disabled={!isConnected}
                 step="0.01"
                 min="0"
               />
               <button
-                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleSetCh2Voltage}
+                className={`p-2 ${ch2VoltageDirty ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-blue-500 hover:bg-blue-600'} transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                onClick={async () => {
+                  await handleSetCh2Voltage()
+                  setCh2VoltageDirty(false)
+                }}
                 disabled={!isConnected}
               >
                 Apply
@@ -549,14 +595,20 @@ export default function Sidebar({
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter current"
                 value={ch2CurrentInput}
-                onChange={(e) => setCh2CurrentInput(e.target.value)}
+                onChange={(e) => {
+                  setCh2CurrentInput(e.target.value)
+                  setCh2CurrentDirty(true)
+                }}
                 disabled={!isConnected}
                 step="0.001"
                 min="0"
               />
               <button
-                className="p-2 bg-blue-500 hover:bg-blue-600 transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                onClick={handleSetCh2Current}
+                className={`p-2 ${ch2CurrentDirty ? 'bg-yellow-400 hover:bg-yellow-500' : 'bg-blue-500 hover:bg-blue-600'} transition-all text-white rounded cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed`}
+                onClick={async () => {
+                  await handleSetCh2Current()
+                  setCh2CurrentDirty(false)
+                }}
                 disabled={!isConnected}
               >
                 Apply
